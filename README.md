@@ -52,3 +52,17 @@ let (status_line, contents) = ...
 Dengan cara ini, variabel dapat digunakan secara global dalam fungsi tanpa perlu mendeklarasikan ulang di setiap kondisi if-else. Hal ini meningkatkan keterbacaan dan menjaga efisiensi kode. Maka dari itu refactoring sangat penting.
 
 ![Commit 3 screen capture](/images/commit3.png)
+
+## Milestone 4: Simulation Slow Response
+
+Pada tahap ini, kita akan mensimulasikan kondisi di mana web server memberikan respons yang lambat.
+
+Fungsi thread::sleep digunakan untuk menunda eksekusi program dalam jangka waktu tertentu. Selain itu, kita memanfaatkan match untuk memeriksa permintaan (request) yang diterima dari klien.
+
+Jika permintaan yang diterima adalah "GET /sleep HTTP/1.1", server akan berhenti (sleep) selama 10 detik sebelum mengirimkan respons. Simulasi ini menunjukkan bagaimana respons lambat dapat mempengaruhi permintaan lain yang masuk ke server.
+
+Untuk mengujinya, kita dapat membuka dua jendela browser dan membandingkan hasilnya dengan membuka dua endpoint yang berbeda:
+- / → Memuat halaman seperti biasa.
+- /sleep → Server akan tertunda selama 10 detik sebelum merespons.
+
+Jika kita mencoba membuka / setelah sebelumnya mengakses /sleep, kita akan melihat bahwa halaman / tidak langsung dimuat dan harus menunggu hingga proses sleep selama 10 detik selesai. Ini menunjukkan bahwa dalam single-threaded web server, satu permintaan yang lambat dapat memperlambat semua permintaan lainnya.

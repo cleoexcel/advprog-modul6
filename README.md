@@ -29,3 +29,26 @@ Setelah konten HTML diperoleh, kita menyusun respons HTTP dengan menambahkan sta
 Terakhir, respons yang telah dibuat dikirimkan ke klien melalui koneksi TCP stream dengan menggunakan metode write_all, sehingga pengguna dapat menerima dan menampilkan halaman HTML tersebut di browser mereka masing-masing.
 
 ![Commit 2 screen capture](/images/commit2.png)
+
+## Milestone 3: Validating Request and Selectively Responding
+Sebelumnya, web server selalu menampilkan hello.html tanpa memperhatikan jenis permintaan yang diterima. Dalam tahap ini, kita menambahkan mekanisme untuk memvalidasi permintaan agar hanya memberikan hello.html jika klien meminta halaman /. Jika permintaan berbeda, server akan mengembalikan halaman error 404 beserta kode status 404 Not Found. File notavailable.html dibuat dengan cara yang sama seperti hello.html.
+
+```rust
+let request_line = buf_reader.lines().next().unwrap().unwrap();
+```
+- .lines() → Menghasilkan iterator yang membaca tiap baris dari BufReader.
+- .next() → Mengambil baris pertama dari iterator tersebut, yaitu permintaan HTTP (request line).
+- unwrap() pertama → Mengambil nilai dari Option<String>, karena .next() bisa mengembalikan None.
+- unwrap() kedua → Mengambil nilai dari Result<String, io::Error>, karena .lines() bisa mengalami kesalahan saat membaca.
+
+Agar kode tetap bersih dan terstruktur, saya melakukan refactoring pada main.rs.
+Sebelumnya, variabel contents dan status_line dideklarasikan dalam setiap blok if-else, sehingga cakupannya terbatas dan tidak bisa digunakan di luar blok tersebut.
+
+Solusinya, saya menggunakan:
+
+```rust
+let (status_line, contents) = ...
+```
+Dengan cara ini, variabel dapat digunakan secara global dalam fungsi tanpa perlu mendeklarasikan ulang di setiap kondisi if-else. Hal ini meningkatkan keterbacaan dan menjaga efisiensi kode. Maka dari itu refactoring sangat penting.
+
+![Commit 3 screen capture](/images/commit3.png)

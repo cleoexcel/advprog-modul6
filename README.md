@@ -66,3 +66,16 @@ Untuk mengujinya, kita dapat membuka dua jendela browser dan membandingkan hasil
 - /sleep → Server akan tertunda selama 10 detik sebelum merespons.
 
 Jika kita mencoba membuka / setelah sebelumnya mengakses /sleep, kita akan melihat bahwa halaman / tidak langsung dimuat dan harus menunggu hingga proses sleep selama 10 detik selesai. Ini menunjukkan bahwa dalam single-threaded web server, satu permintaan yang lambat dapat memperlambat semua permintaan lainnya.
+
+## Milestone 5: Multithreaded Server
+Pada tahap ini, saya melakukan peningkatan pada web server, mengubahnya dari single-threaded menjadi multi-threaded. Untuk mencapai hal ini, saya menggunakan ThreadPool, yang berfungsi untuk mengatur sejumlah thread yang siap menangani tugas (tasks) yang masuk.
+
+Dalam implementasi awal, ThreadPool hanya berisi kumpulan Worker, yaitu struktur data yang menyimpan JoinHandle<()> untuk masing-masing thread.
+Untuk mengubah sistem menjadi multithreaded, ThreadPool diperbarui agar dapat menyimpan vektor dari objek Worker. Setiap Worker diberikan ID unik serta satu thread yang diinisialisasi dengan closure kosong. Selain itu, saat ThreadPool dibuat, sebuah channel juga diinisialisasi. Dalam mekanisme ini:
+
+- Sender disimpan dalam ThreadPool, sedangkan
+- Receiver disalin ke setiap Worker, memungkinkan komunikasi antar thread.
+
+Ketika sebuah task dikirim ke metode execute, task tersebut akan dikirim melalui sender channel, lalu diterima dan dijalankan oleh salah satu thread yang tersedia. Setiap Worker secara terus-menerus mengambil task dari receiver channel dan menjalankannya dalam loop menggunakan mutex untuk mencegah terjadinya race condition.
+
+Dengan pendekatan ini, ThreadPool dapat mengelola banyak tugas secara bersamaan (concurrent execution), mengoptimalkan pemanfaatan sumber daya CPU, serta mengurangi overhead yang terjadi akibat membuat terlalu banyak thread. Penggunaan channel juga memastikan bahwa tugas didistribusikan dengan aman ke thread yang tersedia, sehingga meningkatkan efisiensi dan stabilitas server.

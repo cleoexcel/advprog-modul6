@@ -79,3 +79,15 @@ Untuk mengubah sistem menjadi multithreaded, ThreadPool diperbarui agar dapat me
 Ketika sebuah task dikirim ke metode execute, task tersebut akan dikirim melalui sender channel, lalu diterima dan dijalankan oleh salah satu thread yang tersedia. Setiap Worker secara terus-menerus mengambil task dari receiver channel dan menjalankannya dalam loop menggunakan mutex untuk mencegah terjadinya race condition.
 
 Dengan pendekatan ini, ThreadPool dapat mengelola banyak tugas secara bersamaan (concurrent execution), mengoptimalkan pemanfaatan sumber daya CPU, serta mengurangi overhead yang terjadi akibat membuat terlalu banyak thread. Penggunaan channel juga memastikan bahwa tugas didistribusikan dengan aman ke thread yang tersedia, sehingga meningkatkan efisiensi dan stabilitas server.
+
+## Bonus Function Improvement
+Pada bagian ini, kita menambahkan fungsi build() sebagai pengganti fungsi new(). Proses refactoring ini mengacu pada panduan dalam buku Rust, khususnya pada bagian [Refactoring to Improve Modularity and Error Handling](https://doc.rust-lang.org/book/ch12-03-improving-error-handling-and-modularity.html).
+
+#### Perbedaan build() dan new()
+Perbedaan utama antara build() dan new() terletak pada cara menangani kesalahan (error handling).
+
+- build() menggunakan pendekatan yang lebih aman, karena mengembalikan Result, sehingga memungkinkan program untuk menangani kesalahan dengan lebih baik.
+- new() di sisi lain, lebih rentan terhadap kesalahan karena dapat langsung memicu panic! jika terjadi kondisi yang tidak diharapkan.
+
+#### Mencegah Nilai Tidak Valid
+Jika ukuran ThreadPool yang diberikan adalah 0 atau negatif, maka build() akan mengembalikan Err dengan pesan kesalahan yang menjelaskan bahwa ukuran tersebut tidak valid atau tidak masuk akal. Dengan pendekatan ini, kita dapat memastikan bahwa ThreadPool selalu dibuat dengan nilai yang benar, meningkatkan stabilitas dan keandalan program
